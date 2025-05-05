@@ -1,4 +1,4 @@
-package com.getray.interview.system_acceptance_tests;
+package com.getray.tests.system_acceptance;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
