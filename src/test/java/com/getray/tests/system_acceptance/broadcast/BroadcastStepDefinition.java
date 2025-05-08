@@ -67,7 +67,7 @@ public class BroadcastStepDefinition {
         userIds = users.stream().map(UserConfigurationModel::id).toList();
     }
 
-    @When("message {string} is sent to users")
+    @When("broadcast message {string} is sent")
     public void broadcastMessageToUsers(String message) {
         BroadcastRequestBody broadcastRequestBody = new BroadcastRequestBody(
                 "1",
