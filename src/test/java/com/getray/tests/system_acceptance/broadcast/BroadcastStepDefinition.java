@@ -64,7 +64,12 @@ public class BroadcastStepDefinition {
 
     @Given("users:")
     public void setUserIdList(List<UserConfigurationModel> users) {
-        userIds = users.stream().map(UserConfigurationModel::id).toList();
+        userIds = users.stream().map((UserConfigurationModel user) -> {
+            if (user.id() == null) {
+                throw new NullPointerException("User id is null");
+            }
+            return user.id();
+        }).toList();
     }
 
     @When("broadcast message {string} is sent")
