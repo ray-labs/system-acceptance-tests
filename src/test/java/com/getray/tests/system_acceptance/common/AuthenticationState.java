@@ -1,5 +1,8 @@
 package com.getray.tests.system_acceptance.common;
 
+import com.getray.tests.system_acceptance.configuration.LegacyBackendConfiguration;
+import com.getray.tests.system_acceptance.configuration.UserConfiguration;
+import com.getray.tests.system_acceptance.configuration.UserConfigurationModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,12 +14,16 @@ import org.springframework.web.server.ResponseStatusException;
 @Component
 public class AuthenticationState {
 
-    public static final String host = "https://api-test.getray.com";
-    private String xSession;
+    private final LegacyBackendConfiguration backendConfiguration;
     private final RestClient restClient;
+    private String xSession;
+    private UserConfigurationModel admin;
+
 
     @Autowired
-    public AuthenticationState(RestClient restClient) {
+    public AuthenticationState(LegacyBackendConfiguration backendConfiguration, UserConfiguration userConfiguration, RestClient restClient) {
+        this.backendConfiguration = backendConfiguration;
+        admin = userConfiguration.user().get("admin");
         this.restClient = restClient;
     }
 
@@ -31,10 +38,10 @@ public class AuthenticationState {
 
     private ResponseEntity<String> sendAuthenticationRequest() {
         AuthenticationRequestBody requestBody =
-                new AuthenticationRequestBody("admin@getray.com", "1234562");
+                new AuthenticationRequestBody(admin.username(), admin.password());
 
         ResponseEntity<String> response = restClient.post()
-                .uri(host + "/cms/v1/auth/Login")
+                .uri(backendConfiguration.url() + "/cms/v1/auth/Login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(requestBody)
                 .retrieve()

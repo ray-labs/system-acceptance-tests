@@ -1,6 +1,7 @@
 Feature: Broadcast
+
   Scenario: Broadcast Message To User(s)
-    Given users with ids:
-      | 35568 |
-    When message "Hiba is testing" is sent
+    Given users:
+      | userA |
+    When message "burning ❤️‍🔥" is sent to users
     Then broadcast recieved

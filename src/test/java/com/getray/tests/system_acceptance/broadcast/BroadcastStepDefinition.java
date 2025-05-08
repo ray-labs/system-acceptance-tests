@@ -3,7 +3,11 @@ package com.getray.tests.system_acceptance.broadcast;
 import com.getray.tests.system_acceptance.common.AuthenticationState;
 import com.getray.tests.system_acceptance.broadcast.requestBody.BroadcastRequestBody;
 import com.getray.tests.system_acceptance.broadcast.requestBody.TranslationList;
-import io.cucumber.datatable.DataTable;
+import com.getray.tests.system_acceptance.configuration.LegacyBackendConfiguration;
+import com.getray.tests.system_acceptance.configuration.UserConfiguration;
+import com.getray.tests.system_acceptance.configuration.UserConfigurationModel;
+import io.cucumber.java.DataTableType;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -22,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.getray.tests.system_acceptance.common.AuthenticationState.host;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -30,44 +33,52 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class BroadcastStepDefinition {
     private final RestClient restClient;
+    private final UserConfiguration userConfiguration;
     private final BasicJsonTester jsonTester;
-    private ResponseEntity<String> responseEntity;
     private final String xSession;
-    private List<Integer> userIdList = new ArrayList<>();
+    private final LegacyBackendConfiguration backendConfiguration;
+    private ResponseEntity<String> responseEntity;
+    private List<Integer> userIds = new ArrayList<>();
+
 
     @Autowired
-    public BroadcastStepDefinition(RestClient restClient, AuthenticationState authenticationState) {
+    public BroadcastStepDefinition(RestClient restClient, AuthenticationState authenticationState, LegacyBackendConfiguration backendConfiguration,
+                                   UserConfiguration userConfiguration) {
         this.restClient = restClient;
+        this.userConfiguration = userConfiguration;
         xSession = authenticationState.getAdminSession();
+        this.backendConfiguration = backendConfiguration;
         jsonTester = new BasicJsonTester(getClass());
 
     }
 
-//    @ParameterType(".*")
-//    public List<Integer> intList(String input){
-//
-//    }
-
-    @Given("users with ids:")
-    public void setUserIdList(DataTable dataTable) {
-        List<String> userIds = dataTable.asList();
-        userIdList = userIds.stream()
-                .map(Integer::parseInt)
-                .toList();
+    @ParameterType(".*")
+    public UserConfigurationModel user(String userName) {
+        return userConfiguration.user().get(userName);
     }
 
-    @When("message {string} is sent")
+    @DataTableType
+    public UserConfigurationModel userTable(String userName) {
+        return userConfiguration.user().get(userName);
+    }
+
+    @Given("users:")
+    public void setUserIdList(List<UserConfigurationModel> users) {
+        userIds = users.stream().map(UserConfigurationModel::id).toList();
+    }
+
+    @When("message {string} is sent to users")
     public void broadcastMessageToUsers(String message) {
         BroadcastRequestBody broadcastRequestBody = new BroadcastRequestBody(
                 "1",
                 "message",
-                userIdList,
+                userIds,
                 0,
-                new TranslationList(Map.of("message",message))
+                new TranslationList(Map.of("message", message))
         );
         responseEntity = restClient
                 .post()
-                .uri(host + "/cms/v1/Bot/Broadcast")
+                .uri(backendConfiguration.url() + "/cms/v1/Bot/Broadcast")
                 .header("x-session", xSession)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(broadcastRequestBody)
