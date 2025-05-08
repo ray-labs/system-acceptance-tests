@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: system-acceptance-tests
+
+legacy:
+  url: ${LEGACY_BACKEND_URL}
+
+users:
+  user:
+    admin:
+      username: ${ADMIN_USERNAME}
+      password: ${ADMIN_PASSWORD}
+
+    userA:
+      id: 35568
+
