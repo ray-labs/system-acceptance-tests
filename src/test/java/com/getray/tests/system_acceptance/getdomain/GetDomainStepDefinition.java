@@ -1,7 +1,9 @@
 package com.getray.tests.system_acceptance.getdomain;
 
 import com.getray.tests.system_acceptance.common.AuthenticationState;
-import com.getray.tests.system_acceptance.configuration.LegacyBackendConfiguration;
+import com.getray.tests.system_acceptance.configuration.CucumberTestConfiguration;
+import com.getray.tests.system_acceptance.configuration.DomainConfigurationModel;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,25 +19,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class GetDomainStepDefinition {
     private final RestClient restClient;
-    private final LegacyBackendConfiguration backendConfiguration;
+    private final CucumberTestConfiguration testConfiguration;
     private final String xSession;
     private final BasicJsonTester jsonTester = new BasicJsonTester(getClass());
     private ResponseEntity<String> responseEntity;
-    private int domainId;
+    private Integer domainId;
 
 
     @Autowired
-    public GetDomainStepDefinition(RestClient restClient, LegacyBackendConfiguration backendConfiguration, AuthenticationState authenticationState) {
+    public GetDomainStepDefinition(RestClient restClient, CucumberTestConfiguration testConfiguration, AuthenticationState authenticationState) {
         this.restClient = restClient;
-        this.backendConfiguration = backendConfiguration;
+        this.testConfiguration = testConfiguration;
         xSession = authenticationState.getAdminSession();
     }
 
-    @When("get domain with id {int}")
-    public void getDomainWithId(int domainId) {
-        this.domainId = domainId;
+    @ParameterType(".*")
+    public DomainConfigurationModel domain(String domainName) {
+        return testConfiguration.domains().get(domainName);
+    }
+
+    @When("get domain of {domain}")
+    public void getDomainWithId(DomainConfigurationModel domain) {
+        domainId = domain.id();
         String uri = UriComponentsBuilder
-                .fromUriString(backendConfiguration.url())
+                .fromUriString(testConfiguration.legacyBackend())
                 .path("/cms/v1/Domains/GetDomain")
                 .queryParam("domain_id", domainId)
                 .toUriString();

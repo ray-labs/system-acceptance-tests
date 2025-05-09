@@ -2,15 +2,17 @@ spring:
   application:
     name: system-acceptance-tests
 
-legacy:
-  url: ${LEGACY_BACKEND_URL}
+cucumber:
+  legacy-backend: ${LEGACY_BACKEND_URL}
 
-users:
-  user:
+  users:
     admin:
+      id: 1
       username: ${ADMIN_USERNAME}
       password: ${ADMIN_PASSWORD}
-
     userA:
       id: 35568
 
+  domains:
+    sandbox1:
+      id: 1

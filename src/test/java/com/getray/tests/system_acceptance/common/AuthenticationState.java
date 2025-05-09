@@ -1,7 +1,6 @@
 package com.getray.tests.system_acceptance.common;
 
-import com.getray.tests.system_acceptance.configuration.LegacyBackendConfiguration;
-import com.getray.tests.system_acceptance.configuration.UserConfiguration;
+import com.getray.tests.system_acceptance.configuration.CucumberTestConfiguration;
 import com.getray.tests.system_acceptance.configuration.UserConfigurationModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,16 +13,16 @@ import org.springframework.web.server.ResponseStatusException;
 @Component
 public class AuthenticationState {
 
-    private final LegacyBackendConfiguration backendConfiguration;
+    private final CucumberTestConfiguration testConfiguration;
     private final RestClient restClient;
     private String xSession;
     private UserConfigurationModel admin;
 
 
     @Autowired
-    public AuthenticationState(LegacyBackendConfiguration backendConfiguration, UserConfiguration userConfiguration, RestClient restClient) {
-        this.backendConfiguration = backendConfiguration;
-        admin = userConfiguration.user().get("admin");
+    public AuthenticationState(CucumberTestConfiguration testConfiguration, RestClient restClient) {
+        this.testConfiguration = testConfiguration;
+        admin = testConfiguration.users().get("admin");
         this.restClient = restClient;
     }
 
@@ -41,7 +40,7 @@ public class AuthenticationState {
                 new AuthenticationRequestBody(admin.username(), admin.password());
 
         ResponseEntity<String> response = restClient.post()
-                .uri(backendConfiguration.url() + "/cms/v1/auth/Login")
+                .uri(testConfiguration.legacyBackend() + "/cms/v1/auth/Login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(requestBody)
                 .retrieve()
