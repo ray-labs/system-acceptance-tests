@@ -1,9 +1,9 @@
 Feature: Get Domain
 
-  Scenario: Returns Valid Domain
+  Scenario: Valid Domain Given Valid Domain Id
     When get domain with id 1
     Then domain is returned
 
-  Scenario: Returns Domain Null
+  Scenario: Domain Null Given Invalid Domain Id
     When get domain with id 234
     Then domain is null
