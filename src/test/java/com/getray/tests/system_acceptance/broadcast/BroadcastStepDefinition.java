@@ -91,6 +91,25 @@ public class BroadcastStepDefinition {
                 .toEntity(String.class);
     }
 
+    @When("broadcast message {string} is sent to {user}")
+    public void broadcastMessageToUser(String message, UserConfigurationModel user) {
+        BroadcastRequestBody broadcastRequestBody = new BroadcastRequestBody(
+                "1",
+                "message",
+                List.of(user.id()),
+                0,
+                new TranslationList(Map.of("message", message))
+        );
+        responseEntity = restClient
+                .post()
+                .uri(backendConfiguration.url() + "/cms/v1/Bot/Broadcast")
+                .header("x-session", xSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(broadcastRequestBody)
+                .retrieve()
+                .toEntity(String.class);
+    }
+
     @Then("broadcast recieved")
     public void broadCastRecieved() {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
