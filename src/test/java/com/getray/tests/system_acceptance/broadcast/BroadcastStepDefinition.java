@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BroadcastStepDefinition {
     private final RestClient restClient;
     private final UserConfiguration userConfiguration;
-    private final BasicJsonTester jsonTester;
+    private final BasicJsonTester jsonTester = new BasicJsonTester(getClass());
     private final String xSession;
     private final LegacyBackendConfiguration backendConfiguration;
     private ResponseEntity<String> responseEntity;
@@ -48,8 +48,6 @@ public class BroadcastStepDefinition {
         this.userConfiguration = userConfiguration;
         xSession = authenticationState.getAdminSession();
         this.backendConfiguration = backendConfiguration;
-        jsonTester = new BasicJsonTester(getClass());
-
     }
 
     @ParameterType(".*")
@@ -65,6 +63,9 @@ public class BroadcastStepDefinition {
     @Given("users:")
     public void setUserIdList(List<UserConfigurationModel> users) {
         userIds = users.stream().map((UserConfigurationModel user) -> {
+            if (user == null) {
+                throw new NullPointerException("User is null");
+            }
             if (user.id() == null) {
                 throw new NullPointerException("User id is null");
             }
