@@ -16,7 +16,7 @@ public class AuthenticationState {
     private final CucumberTestConfiguration testConfiguration;
     private final RestClient restClient;
     private String xSession;
-    private UserConfigurationModel admin;
+    private final UserConfigurationModel admin;
 
 
     @Autowired
@@ -26,7 +26,7 @@ public class AuthenticationState {
         this.restClient = restClient;
     }
 
-    public String getAdminSession() {
+    public synchronized String getAdminSession() {
         if (xSession != null) {
             return xSession;
         }
